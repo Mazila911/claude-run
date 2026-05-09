@@ -11,6 +11,15 @@ Browse your Claude Code conversation history in a beautiful web UI
 
 </div>
 
+> **⚡ Active Fork** — This is a community-maintained fork of [nilbuild/claude-run](https://github.com/nilbuild/claude-run). The original project has been inactive since early 2025 with unmerged PRs. This fork continues active development with new features and improvements.
+>
+> **Changes from upstream:**
+> - Session ID search in session list filter
+> - UI theme and component improvements
+> - Enhanced tool renderers (bash, edit, read, search, etc.)
+> - Improved markdown rendering
+> - Better scroll behavior
+
 <br />
 
 Run the project simply by executing
@@ -78,7 +87,7 @@ Claude Code stores conversation history in `~/.claude/`. This tool reads that da
 
 ```bash
 # Clone the repo
-git clone https://github.com/kamranahmedse/claude-run.git
+git clone https://github.com/Mazila911/claude-run.git
 cd claude-run
 
 # Install dependencies
@@ -94,3 +103,5 @@ pnpm build
 ## License
 
 MIT © Kamran Ahmed
+
+Originally created by [Kamran Ahmed](https://github.com/kamranahmedse). This fork is maintained by [Mazila911](https://github.com/Mazila911).
