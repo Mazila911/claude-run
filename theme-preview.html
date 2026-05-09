@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Claude Run 主题预览</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif; font-size: 14px; line-height: 1.6; background: #f0f0f0; padding: 32px; }
+    h1 { font-size: 28px; margin-bottom: 8px; }
+    h2 { font-size: 20px; margin: 32px 0 16px; padding-bottom: 8px; border-bottom: 2px solid #ddd; }
+    .subtitle { color: #666; margin-bottom: 32px; }
+    .row { display: flex; gap: 24px; flex-wrap: wrap; }
+    .theme-col { flex: 1; min-width: 420px; border-radius: 12px; overflow: hidden; box-shadow: 0 2px 12px rgba(0,0,0,0.1); }
+    .theme-header { padding: 16px 20px; font-weight: 600; font-size: 16px; }
+    .dark-header { background: #18181b; color: #fafafa; }
+    .light-header { background: #ffffff; color: #18181b; border-bottom: 1px solid #e4e4e7; }
+
+    /* === 背景 & 文字 === */
+    .section { padding: 16px 20px; }
+    .dark-section { background: #09090b; }
+    .light-section { background: #ffffff; }
+    .swatch-row { display: flex; gap: 12px; margin-bottom: 12px; flex-wrap: wrap; }
+    .swatch { width: 100px; height: 64px; border-radius: 8px; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 11px; font-weight: 500; }
+    .swatch-dark { color: #fafafa; border: 1px solid rgba(255,255,255,0.1); }
+    .swatch-light { color: #18181b; border: 1px solid rgba(0,0,0,0.1); }
+    .swatch small { font-size: 9px; opacity: 0.7; margin-top: 2px; }
+
+    /* === 模拟组件 === */
+    .mock-sidebar { width: 100%; }
+    .dark-mock-sidebar { background: #09090b; border-right: 1px solid rgba(63,63,70,0.6); }
+    .light-mock-sidebar { background: #ffffff; border-right: 1px solid #e4e4e7; }
+    .mock-session-item { padding: 12px 16px; border-bottom: 1px solid; cursor: default; }
+    .dark-mock-session-item { border-color: rgba(63,63,70,0.4); }
+    .dark-mock-session-item:hover { background: rgba(24,24,27,0.6); }
+    .light-mock-session-item { border-color: #f4f4f5; }
+    .light-mock-session-item:hover { background: #f4f4f5; }
+    .mock-session-item.selected { }
+    .dark-selected { background: rgba(6,182,212,0.3); }
+    .light-selected { background: rgba(6,182,212,0.15); }
+    .mock-project { font-size: 11px; margin-bottom: 2px; }
+    .dark-mock-project { color: #71717a; }
+    .light-mock-project { color: #a1a1aa; }
+    .mock-title { font-size: 13px; line-height: 1.4; }
+    .dark-mock-title { color: #d4d4d8; }
+    .light-mock-title { color: #3f3f46; }
+    .mock-time { font-size: 11px; }
+    .dark-mock-time { color: #52525b; }
+    .light-mock-time { color: #a1a1aa; }
+
+    /* === 消息气泡 === */
+    .mock-chat { padding: 20px; }
+    .dark-mock-chat { background: #09090b; }
+    .light-mock-chat { background: #ffffff; }
+    .bubble-row { display: flex; margin-bottom: 12px; }
+    .bubble-row.user { justify-content: flex-end; }
+    .bubble-row.assistant { justify-content: flex-start; }
+    .bubble { max-width: 75%; padding: 10px 14px; border-radius: 16px; font-size: 14px; line-height: 1.6; }
+    .bubble-user-dark { background: rgba(37,99,235,0.8); color: rgba(219,234,254,1); border-bottom-right-radius: 4px; }
+    .bubble-user-light { background: #3b82f6; color: #ffffff; border-bottom-right-radius: 4px; }
+    .bubble-assistant-dark { background: rgba(26,107,119,0.5); color: #fafafa; border-bottom-left-radius: 4px; }
+    .bubble-assistant-light { background: #ecfeff; color: #27272a; border-bottom-left-radius: 4px; }
+
+    /* === Tool 按钮 === */
+    .tool-btn { display: inline-flex; align-items: center; gap: 6px; padding: 5px 12px; border-radius: 8px; font-size: 12px; margin: 4px 4px 4px 0; font-weight: 500; }
+    .dark-tool-btn { background: rgba(100,116,139,0.1); color: #cbd5e1; border: 1px solid rgba(100,116,139,0.2); }
+    .light-tool-btn { background: #f1f5f9; color: #475569; border: 1px solid #e2e8f0; }
+    .dark-thinking-btn { background: rgba(245,158,11,0.1); color: rgba(251,191,36,0.9); border: 1px solid rgba(245,158,11,0.2); }
+    .light-thinking-btn { background: #fffbeb; color: #d97706; border: 1px solid #fde68a; }
+    .dark-result-btn { background: rgba(20,184,166,0.1); color: rgba(45,212,191,0.9); border: 1px solid rgba(20,184,166,0.2); }
+    .light-result-btn { background: #f0fdfa; color: #0d9488; border: 1px solid #99f6e4; }
+    .dark-error-btn { background: rgba(244,63,94,0.1); color: rgba(251,113,133,0.9); border: 1px solid rgba(244,63,94,0.2); }
+    .light-error-btn { background: #fff1f2; color: #e11d48; border: 1px solid #fecdd3; }
+
+    /* === 代码块 === */
+    .code-block { border-radius: 8px; overflow: hidden; margin: 12px 0; font-family: ui-monospace, monospace; }
+    .code-header { padding: 6px 12px; font-size: 10px; display: flex; justify-content: space-between; }
+    .dark-code-header { background: #18181b; color: #71717a; border-bottom: 1px solid rgba(63,63,70,0.5); }
+    .light-code-header { background: #f4f4f5; color: #a1a1aa; border-bottom: 1px solid #e4e4e7; }
+    .code-body { padding: 12px; font-size: 12px; line-height: 1.6; overflow-x: auto; }
+    .dark-code-body { background: rgba(24,24,27,0.8); color: #d4d4d8; }
+    .light-code-body { background: #fafafa; color: #3f3f46; }
+
+    /* === Diff === */
+    .diff-line { padding: 3px 12px; font-family: ui-monospace, monospace; font-size: 13px; }
+    .dark-diff-add { background: rgba(6,95,70,0.2); color: #6ee7b7; border-left: 2px solid #10b981; }
+    .light-diff-add { background: #ecfdf5; color: #047857; border-left: 2px solid #10b981; }
+    .dark-diff-remove { background: rgba(127,29,29,0.2); color: #fda4af; border-left: 2px solid #f43f5e; }
+    .light-diff-remove { background: #fff1f2; color: #be123c; border-left: 2px solid #f43f5e; }
+
+    /* === Todo === */
+    .todo-item { display: flex; align-items: center; gap: 8px; padding: 10px 12px; font-size: 13px; }
+    .dark-todo-item { border-bottom: 1px solid rgba(63,63,70,0.5); color: #d4d4d8; }
+    .light-todo-item { border-bottom: 1px solid #f4f4f5; color: #3f3f46; }
+    .todo-done { text-decoration: line-through; opacity: 0.5; }
+    .dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+
+    /* === 搜索/输入 === */
+    .mock-input { width: 100%; padding: 8px 12px; border-radius: 8px; font-size: 13px; outline: none; }
+    .dark-mock-input { background: #18181b; color: #e4e4e7; border: 1px solid rgba(63,63,70,0.5); }
+    .light-mock-input { background: #ffffff; color: #27272a; border: 1px solid #d4d4d8; }
+
+    /* === Inline code === */
+    .inline-code { padding: 2px 6px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 12px; }
+    .dark-inline-code { background: rgba(39,39,42,0.8); color: #67e8f9; }
+    .light-inline-code { background: #f4f4f5; color: #0891b2; }
+
+    /* === Link === */
+    .dark-link { color: #22d3ee; }
+    .light-link { color: #0891b2; }
+
+    /* === 按钮 === */
+    .mock-btn { display: inline-flex; align-items: center; gap: 6px; padding: 8px 14px; border-radius: 6px; font-size: 13px; cursor: pointer; }
+    .dark-mock-btn { background: #27272a; color: #d4d4d8; }
+    .dark-mock-btn:hover { background: #3f3f46; }
+    .light-mock-btn { background: #f4f4f5; color: #3f3f46; }
+    .light-mock-btn:hover { background: #e4e4e7; }
+  </style>
+</head>
+<body>
+
+<h1>🎨 Claude Run 主题颜色预览</h1>
+<p class="subtitle">深色 ↔ 浅色 对照 — 每个区块展示同一组件的两种主题效果</p>
+
+<!-- ====== 1. 背景色阶 ====== -->
+<h2>1. 背景色阶</h2>
+<div class="row">
+  <div class="theme-col">
+    <div class="theme-header dark-header">🌙 深色主题</div>
+    <div class="section dark-section">
+      <div class="swatch-row">
+        <div class="swatch swatch-dark" style="background:#09090b;">Page<small>#09090b</small></div>
+        <div class="swatch swatch-dark" style="background:#18181b;">Surface<small>#18181b</small></div>
+        <div class="swatch swatch-dark" style="background:#27272a;">Hover<small>#27272a</small></div>
+        <div class="swatch swatch-dark" style="background:#3f3f46;">Strong<small>#3f3f46</small></div>
+      </div>
+    </div>
+  </div>
+  <div class="theme-col">
+    <div class="theme-header light-header">☀️ 浅色主题</div>
+    <div class="section light-section">
+      <div class="swatch-row">
+        <div class="swatch swatch-light" style="background:#ffffff;">Page<small>#ffffff</small></div>
+        <div class="swatch swatch-light" style="background:#f4f4f5;">Surface<small>#f4f4f5</small></div>
+        <div class="swatch swatch-light" style="background:#e4e4e7;">Hover<small>#e4e4e7</small></div>
+        <div class="swatch swatch-light" style="background:#d4d4d8;">Strong<small>#d4d4d8</small></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ====== 2. 文字色阶 ====== -->
+<h2>2. 文字色阶</h2>
+<div class="row">
+  <div class="theme-col">
+    <div class="theme-header dark-header">🌙 深色主题</div>
+    <div class="section dark-section">
+      <div style="color:#fafafa; font-size:14px; margin-bottom:6px;">主文字 zinc-50 — 标题和强调</div>
+      <div style="color:#e4e4e7; font-size:14px; margin-bottom:6px;">标题文字 zinc-200 — 区块标题</div>
+      <div style="color:#d4d4d8; font-size:14px; margin-bottom:6px;">正文 zinc-300 — 消息内容</div>
+      <div style="color:#a1a1aa; font-size:14px; margin-bottom:6px;">次要 zinc-400 — 辅助信息</div>
+      <div style="color:#71717a; font-size:14px; margin-bottom:6px;">三级 zinc-500 — 时间戳</div>
+      <div style="color:#52525b; font-size:14px;">弱化 zinc-600 — 占位符</div>
+    </div>
+  </div>
+  <div class="theme-col">
+    <div class="theme-header light-header">☀️ 浅色主题</div>
+    <div class="section light-section">
+      <div style="color:#18181b; font-size:14px; margin-bottom:6px;">主文字 zinc-900 — 标题和强调</div>
+      <div style="color:#27272a; font-size:14px; margin-bottom:6px;">标题文字 zinc-800 — 区块标题</div>
+      <div style="color:#3f3f46; font-size:14px; margin-bottom:6px;">正文 zinc-700 — 消息内容</div>
+      <div style="color:#52525b; font-size:14px; margin-bottom:6px;">次要 zinc-600 — 辅助信息</div>
+      <div style="color:#71717a; font-size:14px; margin-bottom:6px;">三级 zinc-500 — 时间戳</div>
+      <div style="color:#a1a1aa; font-size:14px;">弱化 zinc-400 — 占位符</div>
+    </div>
+  </div>
+</div>
+
+<!-- ====== 3. 侧边栏 + 会话列表 ====== -->
+<h2>3. 侧边栏 + 会话列表</h2>
+<div class="row">
+  <div class="theme-col">
+    <div class="theme-header dark-header">🌙 深色主题</div>
+    <div class="mock-sidebar dark-mock-sidebar">
+      <div style="padding:12px 16px; border-bottom: 1px solid rgba(63,63,70,0.6);">
+        <input class="mock-input dark-mock-input" value="Search..." readonly>
+      </div>
+      <div class="mock-session-item dark-mock-session-item dark-selected">
+        <div style="display:flex; justify-content:space-between;"><span class="mock-project dark-mock-project">my-project</span><span class="mock-time dark-mock-time">2h ago</span></div>
+        <div class="mock-title dark-mock-title">Fix the authentication middleware bug</div>
+      </div>
+      <div class="mock-session-item dark-mock-session-item">
+        <div style="display:flex; justify-content:space-between;"><span class="mock-project dark-mock-project">web-app</span><span class="mock-time dark-mock-time">5h ago</span></div>
+        <div class="mock-title dark-mock-title">Add dark mode toggle to settings page</div>
+      </div>
+      <div class="mock-session-item dark-mock-session-item">
+        <div style="display:flex; justify-content:space-between;"><span class="mock-project dark-mock-project">api-server</span><span class="mock-time dark-mock-time">1d ago</span></div>
+        <div class="mock-title dark-mock-title">Refactor database connection pooling</div>
+      </div>
+    </div>
+  </div>
+  <div class="theme-col">
+    <div class="theme-header light-header">☀️ 浅色主题</div>
+    <div class="mock-sidebar light-mock-sidebar">
+      <div style="padding:12px 16px; border-bottom: 1px solid #e4e4e7;">
+        <input class="mock-input light-mock-input" value="Search..." readonly>
+      </div>
+      <div class="mock-session-item light-mock-session-item light-selected">
+        <div style="display:flex; justify-content:space-between;"><span class="mock-project light-mock-project">my-project</span><span class="mock-time light-mock-time">2h ago</span></div>
+        <div class="mock-title light-mock-title">Fix the authentication middleware bug</div>
+      </div>
+      <div class="mock-session-item light-mock-session-item">
+        <div style="display:flex; justify-content:space-between;"><span class="mock-project light-mock-project">web-app</span><span class="mock-time light-mock-time">5h ago</span></div>
+        <div class="mock-title light-mock-title">Add dark mode toggle to settings page</div>
+      </div>
+      <div class="mock-session-item light-mock-session-item">
+        <div style="display:flex; justify-content:space-between;"><span class="mock-project light-mock-project">api-server</span><span class="mock-time light-mock-time">1d ago</span></div>
+        <div class="mock-title light-mock-title">Refactor database connection pooling</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ====== 4. 消息气泡 ====== -->
+<h2>4. 消息气泡</h2>
+<div class="row">
+  <div class="theme-col">
+    <div class="theme-header dark-header">🌙 深色主题</div>
+    <div class="mock-chat dark-mock-chat">
+      <div class="bubble-row user"><div class="bubble bubble-user-dark">帮我写一个 React 组件来显示用户头像</div></div>
+      <div class="bubble-row assistant"><div class="bubble bubble-assistant-dark">好的，我来创建一个 <span class="inline-code dark-inline-code">Avatar</span> 组件，支持 <span class="dark-link">图片加载</span> 和 fallback。</div></div>
+      <div class="bubble-row user"><div class="bubble bubble-user-dark">需要支持多种尺寸</div></div>
+      <div class="bubble-row assistant"><div class="bubble bubble-assistant-dark">没问题，我加上 sm / md / lg 三个尺寸变体。</div></div>
+    </div>
+  </div>
+  <div class="theme-col">
+    <div class="theme-header light-header">☀️ 浅色主题</div>
+    <div class="mock-chat light-mock-chat">
+      <div class="bubble-row user"><div class="bubble bubble-user-light">帮我写一个 React 组件来显示用户头像</div></div>
+      <div class="bubble-row assistant"><div class="bubble bubble-assistant-light">好的，我来创建一个 <span class="inline-code light-inline-code">Avatar</span> 组件，支持 <span class="light-link">图片加载</span> 和 fallback。</div></div>
+      <div class="bubble-row user"><div class="bubble bubble-user-light">需要支持多种尺寸</div></div>
+      <div class="bubble-row assistant"><div class="bubble bubble-assistant-light">没问题，我加上 sm / md / lg 三个尺寸变体。</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ====== 5. Tool 按钮 ====== -->
+<h2>5. Tool 按钮</h2>
+<div class="row">
+  <div class="theme-col">
+    <div class="theme-header dark-header">🌙 深色主题</div>
+    <div class="section dark-section">
+      <div class="tool-btn dark-tool-btn">🔧 bash — npm install</div>
+      <div class="tool-btn dark-tool-btn">📄 read — app.tsx</div>
+      <div class="tool-btn dark-thinking-btn">💡 thinking</div>
+      <div class="tool-btn dark-result-btn">✅ result</div>
+      <div class="tool-btn dark-error-btn">❌ error — file not found</div>
+    </div>
+  </div>
+  <div class="theme-col">
+    <div class="theme-header light-header">☀️ 浅色主题</div>
+    <div class="section light-section">
+      <div class="tool-btn light-tool-btn">🔧 bash — npm install</div>
+      <div class="tool-btn light-tool-btn">📄 read — app.tsx</div>
+      <div class="tool-btn light-thinking-btn">💡 thinking</div>
+      <div class="tool-btn light-result-btn">✅ result</div>
+      <div class="tool-btn light-error-btn">❌ error — file not found</div>
+    </div>
+  </div>
+</div>
+
+<!-- ====== 6. 代码块 ====== -->
+<h2>6. 代码块</h2>
+<div class="row">
+  <div class="theme-col">
+    <div class="theme-header dark-header">🌙 深色主题</div>
+    <div class="section dark-section">
+      <div class="code-block">
+        <div class="code-header dark-code-header"><span>typescript</span><span>📋</span></div>
+        <div class="code-body dark-code-body">export function greet(name: string) {
+  return `Hello, ${name}!`;
+}</div>
+      </div>
+    </div>
+  </div>
+  <div class="theme-col">
+    <div class="theme-header light-header">☀️ 浅色主题</div>
+    <div class="section light-section">
+      <div class="code-block">
+        <div class="code-header light-code-header"><span>typescript</span><span>📋</span></div>
+        <div class="code-body light-code-body">export function greet(name: string) {
+  return `Hello, ${name}!`;
+}</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ====== 7. Diff 渲染 ====== -->
+<h2>7. Diff 渲染</h2>
+<div class="row">
+  <div class="theme-col">
+    <div class="theme-header dark-header">🌙 深色主题</div>
+    <div class="section dark-section" style="padding:0;">
+      <div class="diff-line dark-diff-add"><span style="color:#059669; margin-right:8px;">+</span>const port = process.env.PORT || 3000;</div>
+      <div class="diff-line dark-diff-add"><span style="color:#059669; margin-right:8px;">+</span>app.listen(port);</div>
+      <div class="diff-line dark-diff-remove"><span style="color:#e11d48; margin-right:8px;">-</span>app.listen(8080);</div>
+      <div class="diff-line" style="color:#a1a1aa; padding:2px 12px;"><span style="margin-right:8px;"> </span>// start the server</div>
+    </div>
+  </div>
+  <div class="theme-col">
+    <div class="theme-header light-header">☀️ 浅色主题</div>
+    <div class="section light-section" style="padding:0;">
+      <div class="diff-line light-diff-add"><span style="color:#059669; margin-right:8px;">+</span>const port = process.env.PORT || 3000;</div>
+      <div class="diff-line light-diff-add"><span style="color:#059669; margin-right:8px;">+</span>app.listen(port);</div>
+      <div class="diff-line light-diff-remove"><span style="color:#e11d48; margin-right:8px;">-</span>app.listen(8080);</div>
+      <div class="diff-line" style="color:#71717a; padding:2px 12px;"><span style="margin-right:8px;"> </span>// start the server</div>
+    </div>
+  </div>
+</div>
+
+<!-- ====== 8. Todo 列表 ====== -->
+<h2>8. Todo 列表</h2>
+<div class="row">
+  <div class="theme-col">
+    <div class="theme-header dark-header">🌙 深色主题</div>
+    <div class="section dark-section" style="padding:0;">
+      <div class="todo-item dark-todo-item"><div class="dot" style="background:#10b981;"></div><span class="todo-done">安装依赖</span></div>
+      <div class="todo-item dark-todo-item"><div class="dot" style="background:#10b981;"></div><span class="todo-done">配置 TypeScript</span></div>
+      <div class="todo-item dark-todo-item"><div class="dot" style="background:#f59e0b; animation: spin 1s linear infinite;"></div><span style="color:#fbbf24;">编写 API 路由</span></div>
+      <div class="todo-item dark-todo-item" style="border-bottom:none;"><div class="dot" style="background:#71717a;"></div><span>添加测试用例</span></div>
+    </div>
+  </div>
+  <div class="theme-col">
+    <div class="theme-header light-header">☀️ 浅色主题</div>
+    <div class="section light-section" style="padding:0;">
+      <div class="todo-item light-todo-item"><div class="dot" style="background:#10b981;"></div><span class="todo-done">安装依赖</span></div>
+      <div class="todo-item light-todo-item"><div class="dot" style="background:#10b981;"></div><span class="todo-done">配置 TypeScript</span></div>
+      <div class="todo-item light-todo-item"><div class="dot" style="background:#f59e0b; animation: spin 1s linear infinite;"></div><span style="color:#d97706;">编写 API 路由</span></div>
+      <div class="todo-item light-todo-item" style="border-bottom:none;"><div class="dot" style="background:#a1a1aa;"></div><span>添加测试用例</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- ====== 9. 按钮 & 滚动条 ====== -->
+<h2>9. 按钮 & 滚动条</h2>
+<div class="row">
+  <div class="theme-col">
+    <div class="theme-header dark-header">🌙 深色主题</div>
+    <div class="section dark-section">
+      <div style="display:flex; gap:12px; flex-wrap:wrap;">
+        <div class="mock-btn dark-mock-btn">📋 Copy Resume Command</div>
+        <div class="mock-btn dark-mock-btn">◀ 折叠侧边栏</div>
+      </div>
+      <div style="margin-top:16px; height:40px; background:#18181b; border-radius:8px; overflow:hidden; position:relative;">
+        <div style="position:absolute; right:2px; top:4px; bottom:4px; width:6px; background:#27272a; border-radius:3px;"></div>
+      </div>
+    </div>
+  </div>
+  <div class="theme-col">
+    <div class="theme-header light-header">☀️ 浅色主题</div>
+    <div class="section light-section">
+      <div style="display:flex; gap:12px; flex-wrap:wrap;">
+        <div class="mock-btn light-mock-btn">📋 Copy Resume Command</div>
+        <div class="mock-btn light-mock-btn">◀ 折叠侧边栏</div>
+      </div>
+      <div style="margin-top:16px; height:40px; background:#f4f4f5; border-radius:8px; overflow:hidden; position:relative;">
+        <div style="position:absolute; right:2px; top:4px; bottom:4px; width:6px; background:#d4d4d8; border-radius:3px;"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ====== 10. 完整模拟 ====== -->
+<h2>10. 完整页面模拟</h2>
+<div class="row">
+  <div class="theme-col">
+    <div class="theme-header dark-header">🌙 深色主题</div>
+    <div style="display:flex; height:300px; background:#09090b;">
+      <div style="width:160px; border-right:1px solid rgba(63,63,70,0.6); display:flex; flex-direction:column;">
+        <div style="padding:10px 12px; border-bottom:1px solid rgba(63,63,70,0.6);"><input class="mock-input dark-mock-input" style="font-size:11px; padding:4px 8px;" value="Search..." readonly></div>
+        <div style="flex:1; overflow:hidden;">
+          <div class="mock-session-item dark-mock-session-item dark-selected" style="padding:8px 12px;">
+            <div class="mock-project dark-mock-project">my-project</div>
+            <div class="mock-title dark-mock-title" style="font-size:11px;">Fix auth bug</div>
+          </div>
+          <div class="mock-session-item dark-mock-session-item" style="padding:8px 12px;">
+            <div class="mock-project dark-mock-project">web-app</div>
+            <div class="mock-title dark-mock-title" style="font-size:11px;">Add dark mode</div>
+          </div>
+          <div class="mock-session-item dark-mock-session-item" style="padding:8px 12px;">
+            <div class="mock-project dark-mock-project">api-server</div>
+            <div class="mock-title dark-mock-title" style="font-size:11px;">Refactor DB pool</div>
+          </div>
+        </div>
+      </div>
+      <div style="flex:1; display:flex; flex-direction:column;">
+        <div style="height:36px; border-bottom:1px solid rgba(63,63,70,0.6); display:flex; align-items:center; padding:0 12px; gap:8px;">
+          <span style="color:#a1a1aa; font-size:11px;">Fix auth middleware bug</span>
+          <span style="color:#52525b; font-size:10px; margin-left:auto;">my-project</span>
+        </div>
+        <div style="flex:1; padding:12px; overflow-y:auto;">
+          <div class="bubble-row user" style="margin-bottom:8px;"><div class="bubble bubble-user-dark" style="font-size:12px; padding:8px 12px;">修复 token 验证逻辑</div></div>
+          <div class="bubble-row assistant" style="margin-bottom:8px;"><div class="bubble bubble-assistant-dark" style="font-size:12px; padding:8px 12px;">好的，我来检查一下中间件代码。</div></div>
+          <div class="tool-btn dark-tool-btn" style="font-size:10px;">🔧 bash — cat middleware.ts</div>
+          <div class="tool-btn dark-result-btn" style="font-size:10px; margin-left:4px;">✅ result</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="theme-col">
+    <div class="theme-header light-header">☀️ 浅色主题</div>
+    <div style="display:flex; height:300px; background:#ffffff;">
+      <div style="width:160px; border-right:1px solid #e4e4e7; display:flex; flex-direction:column;">
+        <div style="padding:10px 12px; border-bottom:1px solid #e4e4e7;"><input class="mock-input light-mock-input" style="font-size:11px; padding:4px 8px;" value="Search..." readonly></div>
+        <div style="flex:1; overflow:hidden;">
+          <div class="mock-session-item light-mock-session-item light-selected" style="padding:8px 12px;">
+            <div class="mock-project light-mock-project">my-project</div>
+            <div class="mock-title light-mock-title" style="font-size:11px;">Fix auth bug</div>
+          </div>
+          <div class="mock-session-item light-mock-session-item" style="padding:8px 12px;">
+            <div class="mock-project light-mock-project">web-app</div>
+            <div class="mock-title light-mock-title" style="font-size:11px;">Add dark mode</div>
+          </div>
+          <div class="mock-session-item light-mock-session-item" style="padding:8px 12px;">
+            <div class="mock-project light-mock-project">api-server</div>
+            <div class="mock-title light-mock-title" style="font-size:11px;">Refactor DB pool</div>
+          </div>
+        </div>
+      </div>
+      <div style="flex:1; display:flex; flex-direction:column;">
+        <div style="height:36px; border-bottom:1px solid #e4e4e7; display:flex; align-items:center; padding:0 12px; gap:8px;">
+          <span style="color:#52525b; font-size:11px;">Fix auth middleware bug</span>
+          <span style="color:#a1a1aa; font-size:10px; margin-left:auto;">my-project</span>
+        </div>
+        <div style="flex:1; padding:12px; overflow-y:auto;">
+          <div class="bubble-row user" style="margin-bottom:8px;"><div class="bubble bubble-user-light" style="font-size:12px; padding:8px 12px;">修复 token 验证逻辑</div></div>
+          <div class="bubble-row assistant" style="margin-bottom:8px;"><div class="bubble bubble-assistant-light" style="font-size:12px; padding:8px 12px;">好的，我来检查一下中间件代码。</div></div>
+          <div class="tool-btn light-tool-btn" style="font-size:10px;">🔧 bash — cat middleware.ts</div>
+          <div class="tool-btn light-result-btn" style="font-size:10px; margin-left:4px;">✅ result</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<p style="margin-top:40px; color:#999; font-size:13px; text-align:center;">Claude Run Theme Preview — 深色 ↔ 浅色对照</p>
+
+</body>
+</html>
