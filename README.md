@@ -11,14 +11,14 @@ Browse your Claude Code conversation history in a beautiful web UI
 
 </div>
 
-> **⚡ Active Fork** — This is a community-maintained fork of [nilbuild/claude-run](https://github.com/nilbuild/claude-run). The original project has been inactive since early 2025 with unmerged PRs. This fork continues active development with new features and improvements.
+> **Fork Notice** — This project is forked from [kamranahmedse/claude-run](https://github.com/kamranahmedse/claude-run). I really like this project and started using it as my daily tool. Along the way, I made some adjustments based on my own preferences — UI theme improvements, session search enhancements, and various refinements. Since I'm not sure whether these changes align with the original author's vision, I decided to maintain my own fork and also submitted a PR back to the original repo. I plan to continue optimizing and fixing issues in this fork.
 >
-> **Changes from upstream:**
-> - Session ID search in session list filter
-> - UI theme and component improvements
-> - Enhanced tool renderers (bash, edit, read, search, etc.)
-> - Improved markdown rendering
-> - Better scroll behavior
+> **Changes in this fork:**
+> - UI theme system overhaul and component improvements
+> - Session ID search in the session list filter
+> - Various bug fixes and refinements
+>
+> Full credit to [Kamran Ahmed](https://github.com/kamranahmedse) for creating this awesome project. This fork is licensed under the same [MIT License](LICENSE).
 
 <br />
 
