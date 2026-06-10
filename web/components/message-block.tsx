@@ -18,8 +18,14 @@ import {
   Database,
   HardDrive,
   Bot,
+  Sparkles,
 } from "lucide-react";
-import { sanitizeText, extractTaskNotifications } from "../utils";
+import {
+  sanitizeText,
+  extractTaskNotifications,
+  extractSkillInjection,
+  type SkillInjection,
+} from "../utils";
 import { MarkdownRenderer } from "./markdown-renderer";
 import {
   TodoRenderer,
@@ -50,11 +56,72 @@ function buildToolMap(content: ContentBlock[]): Map<string, string> {
   return toolMap;
 }
 
+function getSkillInjection(
+  content: string | ContentBlock[] | undefined
+): SkillInjection | null {
+  if (typeof content === "string") {
+    return extractSkillInjection(content);
+  }
+  if (Array.isArray(content)) {
+    const textBlock = content.find((b) => b.type === "text" && b.text);
+    if (textBlock?.text) {
+      return extractSkillInjection(textBlock.text);
+    }
+  }
+  return null;
+}
+
+function SkillInjectionBlock(props: { skill: SkillInjection }) {
+  const { skill } = props;
+  const [expanded, setExpanded] = useState(false);
+
+  return (
+    <div className="flex flex-col items-end gap-1.5 py-0.5">
+      <div className={`flex flex-col items-end ${expanded ? "w-full" : ""}`}>
+        <button
+          onClick={() => setExpanded(!expanded)}
+          className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg tool-btn text-[11px] transition-colors border"
+        >
+          <Sparkles size={12} className="opacity-60" />
+          <span className="font-medium">skill</span>
+          <span className="opacity-70 font-normal truncate max-w-[200px]">
+            {skill.name}
+          </span>
+          <span className="text-[10px] opacity-40 ml-0.5">
+            {expanded ? "▼" : "▶"}
+          </span>
+        </button>
+        {expanded && (
+          <pre className="w-full text-xs theme-text-secondary theme-surface border theme-border-strong rounded-lg p-3 mt-2 whitespace-pre-wrap break-words max-h-80 overflow-y-auto">
+            {skill.content}
+          </pre>
+        )}
+      </div>
+      {skill.args && (
+        <div className="flex justify-end w-full min-w-0">
+          <div className="max-w-[85%] min-w-0">
+            <div className="bubble-user rounded-2xl rounded-br-md px-3.5 py-2.5 overflow-hidden">
+              <div className="whitespace-pre-wrap break-words text-[14px] leading-relaxed">
+                {skill.args}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
 const MessageBlock = memo(function MessageBlock(props: MessageBlockProps) {
   const { message } = props;
 
   const isUser = message.type === "user";
   const content = message.message?.content;
+
+  const skillInjection = getSkillInjection(content);
+  if (skillInjection) {
+    return <SkillInjectionBlock skill={skillInjection} />;
+  }
 
   const getTextBlocks = (): ContentBlock[] => {
     if (!content || typeof content === "string") {
@@ -185,6 +252,7 @@ const TOOL_ICONS: Record<string, typeof Wrench> = {
   write: FilePlus2,
   glob: FolderOpen,
   task: Bot,
+  skill: Sparkles,
 };
 
 const TOOL_ICON_PATTERNS: Array<{ patterns: string[]; icon: typeof Wrench }> = [
@@ -232,6 +300,7 @@ const TOOL_PREVIEW_HANDLERS: Record<string, PreviewHandler> = {
   grep: (input) => input.pattern ? `"${String(input.pattern)}"` : null,
   glob: (input) => input.pattern ? String(input.pattern) : null,
   task: (input) => input.description ? String(input.description) : null,
+  skill: (input) => input.skill ? String(input.skill) : null,
 };
 
 function getToolPreview(toolName: string, input: Record<string, unknown> | undefined): string | null {

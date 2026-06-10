@@ -49,6 +49,38 @@ export function extractTaskNotifications(text: string): string[] {
   return summaries;
 }
 
+const SKILL_INJECTION_PREFIX = "Base directory for this skill: ";
+const SKILL_ARGUMENTS_MARKER = "\nARGUMENTS:";
+
+export interface SkillInjection {
+  name: string;
+  content: string;
+  args: string | null;
+}
+
+export function extractSkillInjection(text: string): SkillInjection | null {
+  if (!text.startsWith(SKILL_INJECTION_PREFIX)) {
+    return null;
+  }
+  const newlineIndex = text.indexOf("\n");
+  const path = (
+    newlineIndex === -1
+      ? text.slice(SKILL_INJECTION_PREFIX.length)
+      : text.slice(SKILL_INJECTION_PREFIX.length, newlineIndex)
+  ).trim();
+  const name = path.split("/").filter(Boolean).pop() || path;
+
+  const markerIndex = text.lastIndexOf(SKILL_ARGUMENTS_MARKER);
+  let content = text;
+  let args: string | null = null;
+  if (markerIndex !== -1) {
+    content = text.slice(0, markerIndex).trimEnd();
+    args = text.slice(markerIndex + SKILL_ARGUMENTS_MARKER.length).trim() || null;
+  }
+
+  return { name, content, args };
+}
+
 export function sanitizeText(text: string): string {
   let result = text;
   for (const pattern of SANITIZE_PATTERNS) {
